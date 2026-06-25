@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "courses")
@@ -16,15 +18,23 @@ public class Course {
 	private Long id;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Size(max = 120)
 	private String courseName;
 
 	@Column(nullable = false, unique = true)
+	@NotBlank
+	@Size(max = 50)
 	private String courseCode;
 
+	@Size(max = 500)
 	private String description;
 
+	@Size(max = 50)
 	private String duration;
 
+	@NotBlank
+	@Size(max = 30)
 	private String status;
 
 	public Long getId() {
