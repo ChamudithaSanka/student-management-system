@@ -4,13 +4,16 @@ import java.time.LocalDate;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "students")
@@ -21,22 +24,32 @@ public class Student {
 	private Long id;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Size(max = 100)
 	private String firstName;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Size(max = 100)
 	private String lastName;
 
 	@Column(nullable = false, unique = true)
+	@NotBlank
+	@Email
 	private String email;
 
+	@Size(max = 30)
 	private String phone;
 
+	@Past
 	private LocalDate dateOfBirth;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "course_id")
 	private Course course;
 
+	@NotBlank
+	@Size(max = 30)
 	private String status;
 
 	public Long getId() {
