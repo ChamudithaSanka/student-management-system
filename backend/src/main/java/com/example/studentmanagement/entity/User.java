@@ -9,6 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -19,21 +22,30 @@ public class User {
 	private Long id;
 
 	@Column(nullable = false)
+	@NotBlank
+	@Size(max = 120)
 	private String fullName;
 
 	@Column(nullable = false, unique = true)
+	@NotBlank
+	@Email
 	private String email;
 
 	@Column(nullable = false)
+	@NotBlank
 	private String password;
 
 	@Column(nullable = false)
+	@NotBlank
 	private String role;
 
 	private LocalDateTime createdAt;
 
 	@PrePersist
 	void onCreate() {
+		if (role == null || role.isBlank()) {
+			role = "USER";
+		}
 		createdAt = LocalDateTime.now();
 	}
 
