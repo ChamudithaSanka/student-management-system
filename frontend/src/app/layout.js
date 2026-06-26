@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[radial-gradient(circle_at_top,_#f7fafc_0%,_#eef6f5_45%,_#f6f3eb_100%)] text-slate-900">
+      <body className="min-h-full flex flex-col bg-[radial-gradient(circle_at_top,#f7fafc_0%,#eef6f5_45%,#f6f3eb_100%)] text-slate-900">
         {children}
       </body>
     </html>
