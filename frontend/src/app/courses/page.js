@@ -75,6 +75,7 @@ export default function CoursesPage() {
               <tr>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Code</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
+                <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Duration</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
               </tr>
@@ -84,6 +85,7 @@ export default function CoursesPage() {
                 <tr key={course.id}>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-800">{course.courseCode}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-700">{course.courseName}</td>
+                  <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600">{course.duration || "-"}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-700">{course.status}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm">
                     <div className="flex gap-3">

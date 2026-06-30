@@ -75,6 +75,8 @@ export default function StudentsPage() {
               <tr>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Email</th>
+                <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700 hidden md:table-cell">Phone</th>
+                <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Course</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
               </tr>
@@ -84,6 +86,8 @@ export default function StudentsPage() {
                 <tr key={student.id}>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-800">{student.firstName} {student.lastName}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600">{student.email}</td>
+                  <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600 hidden md:table-cell">{student.phone || "-"}</td>
+                  <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600">{student.course ? student.course.courseName : "None"}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">{student.status}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm">
                     <div className="flex gap-3">
