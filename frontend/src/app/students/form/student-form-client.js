@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getStudentById, saveStudent } from "@/lib/api";
+import { getStudentById, saveStudent, getCourses } from "@/lib/api";
 import { getAuthSession } from "@/lib/storage";
 
 export default function StudentFormClient({ studentId }) {
@@ -17,29 +17,38 @@ export default function StudentFormClient({ studentId }) {
 	const [status, setStatus] = useState("ACTIVE");
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState("");
+	const [courses, setCourses] = useState([]);
 
 	useEffect(() => {
-		if (!studentId) {
-			return;
-		}
-
-		async function loadStudent() {
+		async function loadData() {
 			try {
 				const session = getAuthSession();
-				const student = await getStudentById(session.token, studentId);
-				setFirstName(student.firstName || "");
-				setLastName(student.lastName || "");
-				setEmail(student.email || "");
-				setPhone(student.phone || "");
-				setDateOfBirth(student.dateOfBirth || "");
-				setStatus(student.status || "ACTIVE");
-				setCourseId(student.course?.id ? String(student.course.id) : "");
+				if (!session?.token) return;
+
+				// Fetch courses unconditionally
+				try {
+					const allCourses = await getCourses(session.token);
+					setCourses(allCourses);
+				} catch (err) {
+					console.error("Unable to load courses", err);
+				}
+
+				if (studentId) {
+					const student = await getStudentById(session.token, studentId);
+					setFirstName(student.firstName || "");
+					setLastName(student.lastName || "");
+					setEmail(student.email || "");
+					setPhone(student.phone || "");
+					setDateOfBirth(student.dateOfBirth || "");
+					setStatus(student.status || "ACTIVE");
+					setCourseId(student.course?.id ? String(student.course.id) : "");
+				}
 			} catch (err) {
 				setError(err.message || "Unable to load student");
 			}
 		}
 
-		loadStudent();
+		loadData();
 	}, [studentId]);
 
 	async function handleSubmit(event) {
@@ -105,8 +114,15 @@ export default function StudentFormClient({ studentId }) {
 						</select>
 					</div>
 					<div className="md:col-span-2">
-						<label className="mb-2 block text-sm font-semibold text-slate-700">Course ID</label>
-						<input className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-teal-600" type="number" value={courseId} onChange={(event) => setCourseId(event.target.value)} />
+						<label className="mb-2 block text-sm font-semibold text-slate-700">Course</label>
+						<select className="w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-teal-600" value={courseId} onChange={(event) => setCourseId(event.target.value)}>
+							<option value="">-- No Course Selected --</option>
+							{courses.map((course) => (
+								<option key={course.id} value={course.id}>
+									{course.courseCode} - {course.courseName}
+								</option>
+							))}
+						</select>
 					</div>
 					{error ? <p className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-medium text-rose-700 md:col-span-2">{error}</p> : null}
 					<button className="mt-2 rounded-lg bg-teal-700 px-4 py-2.5 font-semibold text-white hover:bg-teal-800 md:col-span-2" type="submit">
