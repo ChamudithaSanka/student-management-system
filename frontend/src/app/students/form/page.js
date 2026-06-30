@@ -1,5 +1,6 @@
 import StudentFormClient from "./student-form-client";
 
-export default function StudentFormPage({ searchParams }) {
-	return <StudentFormClient studentId={searchParams?.id || null} />;
+export default async function StudentFormPage({ searchParams }) {
+	const params = await searchParams;
+	return <StudentFormClient studentId={params?.id || null} />;
 }

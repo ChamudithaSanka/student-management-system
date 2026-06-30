@@ -1,5 +1,6 @@
 import CourseFormClient from "./course-form-client";
 
-export default function CourseFormPage({ searchParams }) {
-	return <CourseFormClient courseId={searchParams?.id || null} />;
+export default async function CourseFormPage({ searchParams }) {
+	const params = await searchParams;
+	return <CourseFormClient courseId={params?.id || null} />;
 }
