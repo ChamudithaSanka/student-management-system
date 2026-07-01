@@ -115,6 +115,14 @@ export function saveCourse(token, course, id) {
 	});
 }
 
+export function getProfile(token) {
+	return request("/api/users/me", {
+		headers: {
+			Authorization: `Bearer ${token}`,
+		},
+	});
+}
+
 export function getApiBaseUrl() {
 	return API_BASE_URL;
 }
