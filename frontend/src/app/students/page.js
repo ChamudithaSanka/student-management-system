@@ -10,6 +10,10 @@ export default function StudentsPage() {
   const [message, setMessage] = useState("Loading students...");
   const [actionError, setActionError] = useState("");
 
+  const session = getAuthSession();
+  const canWrite = session?.role === "ADMIN" || session?.role === "STAFF";
+  const canDelete = session?.role === "ADMIN";
+
   useEffect(() => {
     const session = getAuthSession();
     if (!session?.token) {
@@ -58,7 +62,9 @@ export default function StudentsPage() {
             <h1 className="text-3xl font-bold text-slate-900">Students</h1>
             <p className="text-slate-600">View and manage student records.</p>
           </div>
-          <Link className="rounded-lg bg-teal-700 px-4 py-2.5 text-center font-semibold text-white hover:bg-teal-800" href="/students/form">Add or Edit Student</Link>
+          {canWrite && (
+            <Link className="rounded-lg bg-teal-700 px-4 py-2.5 text-center font-semibold text-white hover:bg-teal-800" href="/students/form">Add Student</Link>
+          )}
         </div>
 
         {message ? (
@@ -91,12 +97,19 @@ export default function StudentsPage() {
                   <td className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-700">{student.status}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm">
                     <div className="flex gap-3">
-                      <Link className="font-semibold text-teal-700 hover:underline" href={`/students/form?id=${student.id}`}>
-                        Edit
-                      </Link>
-                      <button className="font-semibold text-rose-700 hover:underline" type="button" onClick={() => handleDelete(student.id)}>
-                        Delete
-                      </button>
+                      {canWrite && (
+                        <Link className="font-semibold text-teal-700 hover:underline" href={`/students/form?id=${student.id}`}>
+                          Edit
+                        </Link>
+                      )}
+                      {canDelete && (
+                        <button className="font-semibold text-rose-700 hover:underline" type="button" onClick={() => handleDelete(student.id)}>
+                          Delete
+                        </button>
+                      )}
+                      {!canWrite && !canDelete && (
+                        <span className="text-slate-400 text-sm">View only</span>
+                      )}
                     </div>
                   </td>
                 </tr>

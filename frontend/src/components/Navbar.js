@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import { clearAuthSession, getAuthSession } from "@/lib/storage";
 
 const NAV_LINKS = [
-  { label: "Dashboard", href: "/dashboard" },
-  { label: "Students", href: "/students" },
-  { label: "Courses", href: "/courses" },
+  { label: "Dashboard", href: "/dashboard", roles: ["ADMIN", "STAFF", "STUDENT"] },
+  { label: "Students",  href: "/students",  roles: ["ADMIN", "STAFF"] },
+  { label: "Courses",   href: "/courses",   roles: ["ADMIN", "STAFF", "STUDENT"] },
+  { label: "Profile",   href: "/profile",   roles: ["ADMIN", "STAFF", "STUDENT"] },
 ];
 
 export default function Navbar() {
@@ -35,6 +36,11 @@ export default function Navbar() {
   if (!session && isAuthPage) return null;
   if (!session) return null;
 
+  // Only show links that are allowed for the current role
+  const visibleLinks = NAV_LINKS.filter((link) =>
+    link.roles.includes(session?.role)
+  );
+
   return (
     <nav style={styles.nav}>
       <div style={styles.inner}>
@@ -46,7 +52,7 @@ export default function Navbar() {
 
         {/* Desktop links */}
         <div style={styles.links}>
-          {NAV_LINKS.map((link) => {
+          {visibleLinks.map((link) => {
             const active = pathname.startsWith(link.href);
             return (
               <Link
@@ -89,7 +95,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {menuOpen && (
         <div style={styles.mobileMenu}>
-          {NAV_LINKS.map((link) => {
+          {visibleLinks.map((link) => {
             const active = pathname.startsWith(link.href);
             return (
               <Link
@@ -119,6 +125,7 @@ export default function Navbar() {
     </nav>
   );
 }
+
 
 /* ─── Inline styles ─────────────────────────────────────────────── */
 const styles = {

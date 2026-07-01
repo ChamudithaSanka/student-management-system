@@ -10,6 +10,11 @@ export default function CoursesPage() {
   const [message, setMessage] = useState("Loading courses...");
   const [actionError, setActionError] = useState("");
 
+  const session = getAuthSession();
+  const isStudent = session?.role === "STUDENT";
+  const canWrite = session?.role === "ADMIN" || session?.role === "STAFF";
+  const canDelete = session?.role === "ADMIN";
+
   useEffect(() => {
     const session = getAuthSession();
     if (!session?.token) {
@@ -56,9 +61,13 @@ export default function CoursesPage() {
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-3xl font-bold text-slate-900">Courses</h1>
-            <p className="text-slate-600">View and manage course records.</p>
+            <p className="text-slate-600">
+              {isStudent ? "Browse available courses." : "View and manage course records."}
+            </p>
           </div>
-          <Link className="rounded-lg bg-slate-900 px-4 py-2.5 text-center font-semibold text-white hover:bg-slate-700" href="/courses/form">Add or Edit Course</Link>
+          {canWrite && (
+            <Link className="rounded-lg bg-slate-900 px-4 py-2.5 text-center font-semibold text-white hover:bg-slate-700" href="/courses/form">Add Course</Link>
+          )}
         </div>
 
         {message ? (
@@ -76,8 +85,12 @@ export default function CoursesPage() {
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Code</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Name</th>
                 <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Duration</th>
-                <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
-                <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
+                {!isStudent && (
+                  <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Status</th>
+                )}
+                {!isStudent && (
+                  <th className="border-b border-slate-200 px-4 py-3 text-left text-sm font-semibold text-slate-700">Actions</th>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -86,17 +99,25 @@ export default function CoursesPage() {
                   <td className="border-b border-slate-100 px-4 py-3 text-sm font-semibold text-slate-800">{course.courseCode}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-700">{course.courseName}</td>
                   <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-600">{course.duration || "-"}</td>
-                  <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-700">{course.status}</td>
-                  <td className="border-b border-slate-100 px-4 py-3 text-sm">
-                    <div className="flex gap-3">
-                      <Link className="font-semibold text-teal-700 hover:underline" href={`/courses/form?id=${course.id}`}>
-                        Edit
-                      </Link>
-                      <button className="font-semibold text-rose-700 hover:underline" type="button" onClick={() => handleDelete(course.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+                  {!isStudent && (
+                    <td className="border-b border-slate-100 px-4 py-3 text-sm text-slate-700">{course.status}</td>
+                  )}
+                  {!isStudent && (
+                    <td className="border-b border-slate-100 px-4 py-3 text-sm">
+                      <div className="flex gap-3">
+                        {canWrite && (
+                          <Link className="font-semibold text-teal-700 hover:underline" href={`/courses/form?id=${course.id}`}>
+                            Edit
+                          </Link>
+                        )}
+                        {canDelete && (
+                          <button className="font-semibold text-rose-700 hover:underline" type="button" onClick={() => handleDelete(course.id)}>
+                            Delete
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
