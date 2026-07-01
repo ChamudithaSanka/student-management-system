@@ -44,7 +44,7 @@ public class User {
 	@PrePersist
 	void onCreate() {
 		if (role == null || role.isBlank()) {
-			role = "USER";
+			role = "STUDENT";
 		}
 		createdAt = LocalDateTime.now();
 	}

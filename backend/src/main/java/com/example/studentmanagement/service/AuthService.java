@@ -43,7 +43,7 @@ public class AuthService implements UserDetailsService {
 		user.setFullName(registerRequest.getFullName());
 		user.setEmail(registerRequest.getEmail());
 		user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
-		user.setRole("USER");
+		user.setRole("STUDENT");
 
 		User savedUser = userRepository.save(user);
 		String token = jwtUtil.generateToken(savedUser.getEmail());

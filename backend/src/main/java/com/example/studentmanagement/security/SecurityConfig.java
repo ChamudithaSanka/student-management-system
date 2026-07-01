@@ -30,13 +30,23 @@ public class SecurityConfig {
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
-						.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-						.requestMatchers("/api/auth/**").permitAll()
-						.requestMatchers(HttpMethod.GET, "/api/students/**", "/api/courses/**").authenticated()
-						.requestMatchers(HttpMethod.POST, "/api/students/**", "/api/courses/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.PUT, "/api/students/**", "/api/courses/**").hasRole("ADMIN")
-						.requestMatchers(HttpMethod.DELETE, "/api/students/**", "/api/courses/**").hasRole("ADMIN")
-						.anyRequest().authenticated())
+					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+					.requestMatchers("/api/auth/**").permitAll()
+					// Students: ADMIN + STAFF can read/write; only ADMIN can delete; STUDENT has no access
+					.requestMatchers(HttpMethod.GET, "/api/students/**").hasAnyRole("ADMIN", "STAFF")
+					.requestMatchers(HttpMethod.POST, "/api/students/**").hasAnyRole("ADMIN", "STAFF")
+					.requestMatchers(HttpMethod.PUT, "/api/students/**").hasAnyRole("ADMIN", "STAFF")
+					.requestMatchers(HttpMethod.DELETE, "/api/students/**").hasRole("ADMIN")
+					// Courses: all authenticated users can read; ADMIN + STAFF can write; only ADMIN can delete
+					.requestMatchers(HttpMethod.GET, "/api/courses/**").authenticated()
+					.requestMatchers(HttpMethod.POST, "/api/courses/**").hasAnyRole("ADMIN", "STAFF")
+					.requestMatchers(HttpMethod.PUT, "/api/courses/**").hasAnyRole("ADMIN", "STAFF")
+					.requestMatchers(HttpMethod.DELETE, "/api/courses/**").hasRole("ADMIN")
+					// Profile: any authenticated user can view their own info
+					.requestMatchers("/api/users/me").authenticated()
+					// User list: ADMIN only
+					.requestMatchers("/api/users/**").hasRole("ADMIN")
+					.anyRequest().authenticated())
 				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();
 	}
