@@ -3,7 +3,11 @@ package com.example.studentmanagement.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+
+import java.time.LocalDateTime;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,12 +27,44 @@ public class SecurityConfig {
 		this.jwtFilter = jwtFilter;
 	}
 
+	/** Build a minimal error JSON without requiring Jackson on the compile classpath. */
+	private static String errorJson(int status, String error, String message, String path) {
+		return String.format(
+				"{\"status\":%d,\"error\":\"%s\",\"message\":\"%s\",\"path\":\"%s\",\"timestamp\":\"%s\"}",
+				status, error, message, path, LocalDateTime.now()
+		);
+	}
+
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.csrf(AbstractHttpConfigurer::disable)
 				.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				// 401 — no token or invalid token
+				.exceptionHandling(ex -> ex
+						.authenticationEntryPoint((request, response, authException) -> {
+						response.setStatus(HttpStatus.UNAUTHORIZED.value());
+						response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+						response.getWriter().write(errorJson(
+								HttpStatus.UNAUTHORIZED.value(),
+								"Unauthorized",
+								"Authentication required: missing or invalid token",
+								request.getRequestURI()
+						));
+					})
+					// 403 — authenticated but wrong role
+					.accessDeniedHandler((request, response, accessDeniedException) -> {
+						response.setStatus(HttpStatus.FORBIDDEN.value());
+						response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+						response.getWriter().write(errorJson(
+								HttpStatus.FORBIDDEN.value(),
+								"Forbidden",
+								"Access denied: you do not have permission to perform this action",
+								request.getRequestURI()
+						));
+					})
+				)
 				.authorizeHttpRequests(authorize -> authorize
 					.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 					.requestMatchers("/api/auth/**").permitAll()
